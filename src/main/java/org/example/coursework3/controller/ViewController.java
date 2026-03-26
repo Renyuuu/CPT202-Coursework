@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-//@RequestMapping("/auth")
 @CrossOrigin
 @Slf4j
 public class ViewController {
 
     @Autowired
     private ViewInfoService viewInfoService;
+
 
     @GetMapping("/expertise")
     public Result<List<ExpertiseVo>> getExpertiseList() {

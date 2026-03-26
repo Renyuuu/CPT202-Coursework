@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/me").permitAll()
                         .requestMatchers("/expertise/**").permitAll()
+                        .requestMatchers("/pricing/quote").permitAll()
                         // 3. 其余请求需要认证
                         .anyRequest().authenticated()
                 );
