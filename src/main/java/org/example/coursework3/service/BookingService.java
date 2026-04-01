@@ -14,7 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.example.coursework3.repository.slotRepository;
+import org.example.coursework3.repository.SlotRepository;
 import java.util.List;
 
 @Service
@@ -26,7 +26,7 @@ public class BookingService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private slotRepository slotRepository;
+    private SlotRepository slotRepository;
     public BookingPageResult getSpecialistBookings(String authHeader, String status, Integer page, Integer pageSize) {
         String token = authHeader.replace("Bearer ","");
         String specialistId = authService.getUserIdByToken(token);

@@ -5,7 +5,6 @@ import org.example.coursework3.service.SlotInfoService;
 import org.example.coursework3.vo.SlotVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.example.coursework3.repository.slotRepository;
 
 import java.util.List;
 
