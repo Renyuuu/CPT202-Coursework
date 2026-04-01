@@ -2,14 +2,13 @@ package org.example.coursework3.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.coursework3.entity.Slot;
-import org.example.coursework3.repository.slotRepository;
+import org.example.coursework3.repository.SlotRepository;
 import org.example.coursework3.vo.SlotVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SlotInfoService {
     @Autowired
-    private slotRepository slotRepository;
+    private SlotRepository slotRepository;
 
     public List<SlotVo> getSpecialistSlots(String specialistId, String date, String from, String to) {
         List<Slot> allSlots = slotRepository.findBySpecialistId(specialistId);
