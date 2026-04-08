@@ -41,17 +41,17 @@ public class SlotInfoService {
             OffsetDateTime startOfDay = localDate.atStartOfDay().atOffset(java.time.ZoneOffset.UTC);
             OffsetDateTime endOfDay = startOfDay.plusDays(1);
             allSlots = allSlots.stream()
-                    .filter(slot -> !slot.getStartTime().isBefore(startOfDay) && slot.getStartTime().isBefore(endOfDay))
+                    .filter(slot -> !slot.getStartTime().isBefore(startOfDay.toLocalDateTime()) && slot.getStartTime().isBefore(endOfDay.toLocalDateTime()))
                     .toList();
         }
         if (from != null) {
             allSlots = allSlots.stream()
-                    .filter(slot -> !slot.getStartTime().isBefore(fromTime))
+                    .filter(slot -> !slot.getStartTime().isBefore(fromTime.toLocalDateTime()))
                     .toList();
         }
         if (to != null) {
             allSlots = allSlots.stream()
-                    .filter(slot -> !slot.getStartTime().isAfter(toTime))
+                    .filter(slot -> !slot.getStartTime().isAfter(toTime.toLocalDateTime()))
                     .toList();
         }
         return allSlots.stream()

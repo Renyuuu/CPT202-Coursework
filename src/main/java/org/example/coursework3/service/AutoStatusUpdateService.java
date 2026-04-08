@@ -11,7 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class AutoStatusUpdateService {
     private static final long CANCEL_BEFORE_START_MINUTES = 30;
     private static final long COMPLETE_AFTER_END_HOURS = 2;
 
+    private static final ZoneId APP_ZONE = ZoneId.of("Asia/Shanghai"); // 或 Asia/Shanghai
+
     @Autowired
     private BookingRepository bookingRepository;
 
@@ -32,11 +35,11 @@ public class AutoStatusUpdateService {
     @Scheduled(fixedRate = 300000)
     @Transactional
     public void autoCancelPendingBookings() {
-        OffsetDateTime now = OffsetDateTime.now();
-        OffsetDateTime threshold = now.minusHours(PENDING_EXPIRY_HOURS);
+        LocalDateTime now = LocalDateTime.now(APP_ZONE);
+        LocalDateTime threshold = now.minusHours(PENDING_EXPIRY_HOURS);
 
         List<Booking> allPending = bookingRepository
-                .findByStatusAndCreatedAtBefore(BookingStatus.Pending, threshold.toLocalDateTime());
+                .findByStatusAndCreatedAtBefore(BookingStatus.Pending, threshold);
 
         List<Booking> toCancel = new ArrayList<>();
 
@@ -63,7 +66,7 @@ public class AutoStatusUpdateService {
     @Scheduled(fixedRate = 300000)
     @Transactional
     public void autoCompleteConfirmedBookings() {
-        OffsetDateTime now = OffsetDateTime.now();
+        LocalDateTime now = LocalDateTime.now(APP_ZONE);
 
         List<Booking> allConfirmed = bookingRepository.findByStatus(BookingStatus.Confirmed);
         List<Booking> toComplete = new ArrayList<>();
