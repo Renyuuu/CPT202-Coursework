@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { api } from '@/api/client'
+import { showAlertModal } from '@/ui/alertModal'
 
 const items = ref([])
 const loading = ref(false)
@@ -150,6 +151,7 @@ async function load() {
   } catch (e) {
     error.value = e?.message || 'Failed to load'
     items.value = []
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     loading.value = false
   }
@@ -158,6 +160,7 @@ async function load() {
 async function onCreate() {
   if (!createName.value.trim()) {
     error.value = 'Please enter an expertise name'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   creating.value = true
@@ -172,8 +175,10 @@ async function onCreate() {
     createDesc.value = ''
     await load()
     success.value = 'Expertise created successfully.'
+    showAlertModal({ type: 'success', message: success.value })
   } catch (e) {
     error.value = e?.message || 'Failed to create'
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     creating.value = false
   }
@@ -183,6 +188,7 @@ function openEdit(row) {
   const id = rowId(row)
   if (!id) {
     error.value = 'This expertise record has no ID and cannot be edited.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   error.value = ''
@@ -212,10 +218,12 @@ function closeEdit() {
 async function onUpdate() {
   if (!editId.value) {
     error.value = 'Missing expertise ID'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   if (!editName.value.trim()) {
     error.value = 'Please enter an expertise name'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   updating.value = true
@@ -229,8 +237,10 @@ async function onUpdate() {
     closeEdit()
     await load()
     success.value = 'Expertise updated successfully.'
+    showAlertModal({ type: 'success', message: success.value })
   } catch (e) {
     error.value = e?.message || 'Failed to update'
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     updating.value = false
   }
@@ -240,6 +250,7 @@ async function onDelete(row) {
   const id = rowId(row)
   if (!id) {
     error.value = 'This expertise record has no ID and cannot be deleted.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   const name = String(row?.name ?? id)
@@ -253,8 +264,10 @@ async function onDelete(row) {
     await api.adminDeleteExpertise(id)
     await load()
     success.value = 'Expertise deleted successfully.'
+    showAlertModal({ type: 'success', message: success.value })
   } catch (e) {
     error.value = e?.message || 'Failed to delete'
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     deletingId.value = ''
   }
@@ -323,9 +336,6 @@ onMounted(load)
         </button>
       </div>
     </section>
-
-    <div v-if="success" class="banner banner--success" role="status">{{ success }}</div>
-    <div v-if="error" class="banner banner--error" role="alert">{{ error }}</div>
 
     <section class="calc-card list-card">
       <div class="list-toolbar">

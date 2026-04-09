@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api } from '@/api/client'
+import { showAlertModal } from '@/ui/alertModal'
 
 const expertiseList = ref([])
 const page = ref({ items: [], total: 0 })
@@ -38,7 +39,6 @@ const editExpertiseOpen = ref(false)
 const editExpertiseSearch = ref('')
 const editExpertiseFieldRef = ref(null)
 const editOriginalStatus = ref('Active')
-const editResultOpen = ref(false)
 const editForm = ref({
   id: '',
   name: '',
@@ -286,6 +286,7 @@ async function loadSpecialists() {
     page.value = await api.listSpecialists({ pageSize: 100 })
   } catch (e) {
     error.value = e?.message || 'Failed to load specialists'
+    showAlertModal({ type: 'error', message: error.value })
     page.value = { items: [], total: 0 }
   } finally {
     loading.value = false
@@ -298,14 +299,17 @@ async function onCreate() {
 
   if (!form.value.name.trim()) {
     error.value = 'Please enter a name'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   if (!form.value.userEmail.trim()) {
     error.value = 'Please enter user email'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   if (!form.value.expertiseIds.length) {
     error.value = 'Please select at least one expertise item'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
 
@@ -329,8 +333,10 @@ async function onCreate() {
     closeExpertisePicker()
     await loadSpecialists()
     success.value = 'Specialist created successfully.'
+    showAlertModal({ type: 'success', message: success.value })
   } catch (e) {
     error.value = e?.message || 'Failed to create specialist'
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     creating.value = false
   }
@@ -366,29 +372,23 @@ function closeEdit() {
   editBioLimitError.value = ''
 }
 
-function closeEditResult() {
-  editResultOpen.value = false
-}
-
-function closeEditResultAndEdit() {
-  closeEditResult()
-  closeEdit()
-}
-
 async function onSaveEdit() {
   error.value = ''
   success.value = ''
 
   if (!editForm.value.id) {
     error.value = 'Missing specialist ID.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   if (!editForm.value.name.trim()) {
     error.value = 'Please enter a name.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
   if (!editForm.value.expertiseIds.length) {
     error.value = 'Please select at least one expertise item.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
 
@@ -409,9 +409,10 @@ async function onSaveEdit() {
 
     await loadSpecialists()
     success.value = `Specialist ${editForm.value.id} updated successfully.`
-    editResultOpen.value = true
+    showAlertModal({ type: 'success', message: success.value, onClose: () => closeEdit() })
   } catch (e) {
     error.value = e?.message || 'Failed to update specialist'
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     updateLoading.value = false
   }
@@ -421,6 +422,7 @@ async function onDelete(row) {
   const specialistId = row?.id != null ? String(row.id) : ''
   if (!specialistId) {
     error.value = 'This specialist is missing an ID and cannot be deleted.'
+    showAlertModal({ type: 'error', message: error.value })
     return
   }
 
@@ -435,6 +437,7 @@ async function onDelete(row) {
     await api.adminDeleteSpecialist(specialistId)
     await loadSpecialists()
     success.value = `Specialist ${specialistId} deleted successfully.`
+    showAlertModal({ type: 'success', message: success.value })
     if (editOpen.value && editForm.value.id === specialistId) {
       closeEdit()
     }
@@ -443,6 +446,7 @@ async function onDelete(row) {
     }
   } catch (e) {
     error.value = e?.message || `Failed to delete specialist ${specialistId}.`
+    showAlertModal({ type: 'error', message: error.value })
   } finally {
     deletingId.value = ''
   }
@@ -529,9 +533,6 @@ watch(
         Create and manage specialist profiles, pricing, and expertise assignments.
       </p>
     </header>
-
-    <div v-if="error" class="banner banner--error" role="alert">{{ error }}</div>
-    <div v-if="success" class="banner banner--success" role="status">{{ success }}</div>
 
     <section class="calc-card create-card">
       <h2 class="card-title">Create Specialist</h2>
@@ -932,20 +933,6 @@ watch(
           >
             {{ updateLoading ? 'Saving...' : 'Save Changes' }}
           </button>
-        </div>
-      </section>
-    </div>
-
-    <div v-if="editResultOpen" class="modal-backdrop" @click.self="closeEditResultAndEdit">
-      <section class="modal-card">
-        <div class="panel-head">
-          <h3 class="modal-title">Update Successful</h3>
-        </div>
-
-        <div class="state">Changes have been saved.</div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-primary btn-primary--fit" @click="closeEditResultAndEdit">OK</button>
         </div>
       </section>
     </div>
