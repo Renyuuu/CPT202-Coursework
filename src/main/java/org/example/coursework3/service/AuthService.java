@@ -17,6 +17,14 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
     private final UserRepository userRepository;
 
+    public boolean verifyAsAdmin(String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        String userId = getUserIdByToken(token);
+        Role role = getRoleByUserId(userId);
+        return role == Role.Admin;
+    }
+
+
     public void storeToken(AuthResult result) {
         storeToken(result.getToken(), result.getUser().getId());
     }
