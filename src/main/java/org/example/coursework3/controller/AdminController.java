@@ -26,7 +26,7 @@ public class AdminController {
     // 1. 创建专家
     @PostMapping("/specialists")
     public Result<Specialist> createSpecialist(@RequestHeader("Authorization") String authHeader, @RequestBody CreateSpecialistRequest request) {
-        if (authService.verifyAsAdmin(authHeader)) {
+        if (!authService.verifyAsAdmin(authHeader)) {
             return Result.success(adminService.createSpecialist(request));
         }
         return Result.error("ERROR","请以管理员身份创建");
@@ -35,7 +35,7 @@ public class AdminController {
     // 2. 更新专家信息
     @PatchMapping("/specialists/{id}")
     public Result<Specialist> updateSpecialist(@RequestHeader("Authorization") String authHeader, @PathVariable String id, @RequestBody EditSpecialistRequest request) {
-        if (authService.verifyAsAdmin(authHeader)) {
+        if (!authService.verifyAsAdmin(authHeader)) {
             return Result.success(adminService.updateSpecialist(id, request));
         }
         return Result.error("ERROR","请以管理员身份修改");
@@ -47,7 +47,7 @@ public class AdminController {
     public Result<Specialist> updateSpecialistStatus(@RequestHeader("Authorization") String authHeader,
                                                @PathVariable String id,
                                                @RequestBody UpdateSpecialistStatusRequest request){
-        if (authService.verifyAsAdmin(authHeader)) {
+        if (!authService.verifyAsAdmin(authHeader)) {
             return Result.error("ERROR", "请以管理员身份修改");
         }
         if (request == null || request.getStatus() == null) {
@@ -60,7 +60,7 @@ public class AdminController {
     // 4. 删除专家
     @DeleteMapping("/specialists/{id}")
     public Result<Void> deleteSpecialist(@RequestHeader("Authorization") String authHeader, @PathVariable String id) {
-        if (authService.verifyAsAdmin(authHeader)) {
+        if (!authService.verifyAsAdmin(authHeader)) {
             return Result.error("ERROR", "请以管理员身份修改");
         }
         adminService.deleteSpecialist(id);
@@ -69,23 +69,28 @@ public class AdminController {
 
     // 5. 创建专长
     @PostMapping("/expertise")
-    public Result<Expertise> createExpertise( @RequestBody ExpertiseRequest request){
-//        if (authService.verifyAsAdmin(authHeader)) {
-//            return Result.error("ERROR", "请以管理员身份修改");
-//        }
+    public Result<Expertise> createExpertise(@RequestHeader("Authorization") String authHeader, @RequestBody ExpertiseRequest request){
+        if (!authService.verifyAsAdmin(authHeader)) {
+            return Result.error("ERROR", "请以管理员身份修改");
+        }
         return Result.success(adminService.createExpertise(request.getName(), request.getDescription()));
     }
 
     // 6. 更新专长
     @PatchMapping("/expertise/{id}")
-    public Result<Expertise> updateExpertiseInfo(@PathVariable String id, @RequestBody ExpertiseRequest request){
-
+    public Result<Expertise> updateExpertiseInfo(@RequestHeader("Authorization") String authHeader, @PathVariable String id, @RequestBody ExpertiseRequest request){
+        if (!authService.verifyAsAdmin(authHeader)) {
+            return Result.error("ERROR", "请以管理员身份修改");
+        }
         return Result.success(adminService.updateExpertise(id, request.getName(), request.getDescription()));
     }
 
     // 7. 删除专长
     @DeleteMapping("/expertise/{id}")
-    public Result<Void> deleteExpertise(@PathVariable String id){
+    public Result<Void> deleteExpertise(@RequestHeader("Authorization") String authHeader, @PathVariable String id){
+        if (!authService.verifyAsAdmin(authHeader)) {
+            return Result.error("ERROR", "请以管理员身份修改");
+        }
         adminService.deleteExpertise(id);
         return Result.success("专长删除成功");
     }
