@@ -32,7 +32,7 @@ public class AliyunMailService {
         this.client = new com.aliyun.dm20151123.Client(config);
     }
 
-    @Async
+    @Async("taskExecutor")
     public void sendCaptcha(String toAddress) throws Exception {
         String code = String.valueOf((int)((Math.random() * 9 + 1) * 100000));
         redisTemplate.opsForValue().set("captcha:" + toAddress, code, 5, TimeUnit.MINUTES);
